@@ -1,0 +1,67 @@
+---
+- name: Create firewalls
+  hetzner.hcloud.hcloud_firewall:
+    name: "{{ item.name }}"
+    rules: "{{ item.rules | default([]) }}"
+    api_token: "{{ hcloud__api_token }}"
+    state: present
+  with_items: "{{ hcloud__firewalls }}"
+  run_once: true
+
+- name: Ensure SSH key exists
+  hetzner.hcloud.hcloud_ssh_key:
+    name: "{{ hcloud__ssh_key_name }}"
+    public_key: "{{ hcloud__ssh_public_key }}"
+    api_token: "{{ hcloud__api_token }}"
+  run_once: true
+
+- name: Create networks
+  hetzner.hcloud.hcloud_network:
+    name: "{{ item.name }}"
+    ip_range: "{{ item.network }}"
+    api_token: "{{ hcloud__api_token }}"
+  with_items: "{{ hcloud__networks }}"
+  run_once: true
+
+- name: Ensure server is created
+  hetzner.hcloud.hcloud_server:
+    name: "{{ hcloud__server_name }}"
+    server_type: "{{ hcloud__server_type }}"
+    image: "{{ hcloud__server_image }}"
+    location: "{{ hcloud__server_location }}"
+    ssh_keys: "{{ hcloud__ssh_key_name }}"
+    firewalls: "{{ hcloud__server_firewalls }}"
+    user_data: "{{ hcloud__server_user_data }}"
+    api_token: "{{ hcloud__api_token }}"
+    force: "{{ hcloud__server_force }}"
+    state: "{{ hcloud__server_state }}"
+  register: server
+
+- name: Ensure volume is created and formatted
+  hetzner.hcloud.hcloud_volume:
+    name: "{{ hcloud__server_name }}-{{ item.name }}"
+    server: "{{ hcloud__server_name }}"
+    automount: true
+    format: "{{ item.format | default('ext4') }}"
+    size: "{{ item.size }}"
+    api_token: "{{ hcloud__api_token }}"
+  with_items: "{{ hcloud__server_volumes }}"
+
+- name: Assign server to networks
+  hetzner.hcloud.hcloud_server_network:
+    network: "{{ item.name }}"
+    server: "{{ hcloud__server_name }}"
+    alias_ips: "{{ item.alias_ips | default(omit) }}"
+    api_token: "{{ hcloud__api_token }}"
+  with_items: "{{ hcloud__server_networks }}"
+
+- name: Show server infos
+  when: server.hcloud_server.name is defined
+  block:
+    - name: Show server infos
+      ansible.builtin.debug:
+        msg: "Server: {{ server.hcloud_server.name }} --> {{ server.hcloud_server.ipv4_address }}"
+
+    - name: Assing default IP to ansible_host
+      ansible.builtin.set_fact:
+        ansible_host: "{{ server.hcloud_server.ipv4_address }}"

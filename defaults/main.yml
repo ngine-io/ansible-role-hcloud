@@ -1,0 +1,45 @@
+---
+hcloud__server_name: "{{ inventory_hostname_short }}"
+hcloud__server_type: cx11
+hcloud__server_networks: []
+# hcloud__server_networks:
+#   - name: internal
+#     alias_ips:
+#       - 10.1.0.1
+#       - 10.2.0.1
+
+hcloud__server_image: debian-11
+hcloud__server_location: fsn1
+hcloud__server_firewalls:
+  - default
+
+hcloud__server_user_data: ""
+hcloud__server_volumes: []
+# hcloud__server_volumes:
+#   - name: vol1
+#     size: 10
+
+hcloud__server_force: false
+hcloud__server_state: started
+
+hcloud__ssh_key_name: "{{ lookup('env', 'USER') }}@{{ lookup('pipe', 'hostname') }}"
+hcloud__ssh_public_key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+
+hcloud__networks: []
+# hcloud__networks:
+#  - name: internal
+#    network: 10.10.1.0/24
+
+hcloud__firewalls:
+  - name: default
+    rules:
+      - direction: in
+        protocol: icmp
+        source_ips:
+          - 0.0.0.0/0
+          - ::/0
+      - direction: in
+        protocol: tcp
+        port: "22"
+
+hcloud__api_token: "{{ omit }}"
