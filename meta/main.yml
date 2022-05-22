@@ -6,7 +6,7 @@ galaxy_info:
   author: resmo
   description: Manages Hetzner Cloud resources
   license: MIT
-  min_ansible_version: "2.1"
+  min_ansible_version: "2.11"
   platforms:
     - name: EL
       versions:
