@@ -10,6 +10,17 @@ See `requirements.txt` for python library dependencies.
 
 ## Examples
 
+### Inventory
+
+Given is a inventory similar as:
+
+```ini
+[web]
+web-1
+web-2
+web-3
+```
+
 ### Variables
 
 The following variables are meant to be set in a top level group, e.g.`group_vars/all.yml`.
@@ -62,7 +73,7 @@ hcloud__firewalls:
           - ::/0
 ```
 
-The following configs are server specific and meant to be set in `group_vars` of `host_vars`, e.g. `group_vars/web.yml`
+The following configs are server specific and meant to be set in a lower level `group_vars` or `host_vars`, e.g. `group_vars/web.yml`
 
 Server image to use:
 
@@ -117,7 +128,7 @@ hcloud__server_user_data: |
 
 Ensure a volume is created and attached to the server:
 
-> HINT: use the special variable `inventory_hostname_short` as prefix to see which volume is attached to which server.
+> HINT: Use the special variable `inventory_hostname_short` as prefix to easily identify which volume is attached to which server.
 
 ```yaml
 hcloud__server_volumes:
