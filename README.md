@@ -73,6 +73,15 @@ hcloud__firewalls:
           - ::/0
 ```
 
+Ensure placment groups are created:
+
+```yaml
+hcloud__placement_groups:
+  - name: my placement group
+    labels:
+       project: genesis
+```
+
 The following configs are server specific and meant to be set in a lower level `group_vars` or `host_vars`, e.g. `group_vars/web.yml`
 
 Server image to use:
@@ -100,6 +109,12 @@ Ensure web servers are attached to these networks:
 ```yaml
 hcloud__server_networks:
   - name: internal
+```
+
+Ensure web servers are in a placement group:
+
+```yaml
+hcloud__server_placement_group: my placement group
 ```
 
 Ensure web server have this type:
