@@ -1,4 +1,12 @@
 ---
+- name: Create placement groups
+  hetzner.hcloud.hcloud_placement_group:
+    name: "{{ item.name }}"
+    type: "{{ item.type | default('spread') }}"
+    labels: "{{ item.labels | default(omit) }}"
+  with_items: "{{ hcloud__placement_groups }}"
+  run_once: true
+
 - name: Create firewalls
   hetzner.hcloud.hcloud_firewall:
     name: "{{ item.name }}"
@@ -31,6 +39,7 @@
     location: "{{ hcloud__server_location }}"
     ssh_keys: "{{ hcloud__ssh_key_name }}"
     firewalls: "{{ hcloud__server_firewalls }}"
+    placement_group: "{{ hcloud__server_placement_group }}"
     user_data: "{{ hcloud__server_user_data }}"
     api_token: "{{ hcloud__api_token }}"
     force: "{{ hcloud__server_force }}"

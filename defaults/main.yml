@@ -20,6 +20,7 @@ hcloud__server_volumes: []
 #     size: 10
 
 hcloud__server_force: false
+hcloud__server_placement_group: "{{ omit }}"
 hcloud__server_state: started
 
 hcloud__ssh_key_name: "{{ lookup('env', 'USER') }}@{{ lookup('pipe', 'hostname') }}"
@@ -41,5 +42,11 @@ hcloud__firewalls:
       - direction: in
         protocol: tcp
         port: "22"
+
+hcloud__placement_groups: []
+# hcloud__placement_groups:
+#   - name: my placement group
+#     labels:
+#       mylabel: test
 
 hcloud__api_token: "{{ omit }}"
