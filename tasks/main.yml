@@ -1,9 +1,17 @@
 ---
+- name: Load balancers handling
+  ansible.builtin.include_tasks: load_balancer.yml
+  with_items: "{{ hcloud__loadbalancers }}"
+  loop_control:
+    loop_var: load_balancer
+  run_once: true
+
 - name: Create placement groups
   hetzner.hcloud.hcloud_placement_group:
     name: "{{ item.name }}"
     type: "{{ item.type | default('spread') }}"
-    labels: "{{ item.labels | default(omit) }}"
+    labels: "{{ item.labels | default(hcloud__labels | default(omit)) }}"
+    api_token: "{{ hcloud__api_token }}"
   with_items: "{{ hcloud__placement_groups }}"
   run_once: true
 
@@ -12,7 +20,6 @@
     name: "{{ item.name }}"
     rules: "{{ item.rules | default([]) }}"
     api_token: "{{ hcloud__api_token }}"
-    state: present
   with_items: "{{ hcloud__firewalls }}"
   run_once: true
 
@@ -38,6 +45,7 @@
     image: "{{ hcloud__server_image }}"
     location: "{{ hcloud__server_location }}"
     ssh_keys: "{{ hcloud__ssh_key_name }}"
+    labels: "{{ hcloud__server_labels }}"
     firewalls: "{{ hcloud__server_firewalls }}"
     placement_group: "{{ hcloud__server_placement_group }}"
     user_data: "{{ hcloud__server_user_data }}"
@@ -63,6 +71,15 @@
     alias_ips: "{{ item.alias_ips | default(omit) }}"
     api_token: "{{ hcloud__api_token }}"
   with_items: "{{ hcloud__server_networks }}"
+
+- name: Assign server to load balancer
+  hetzner.hcloud.hcloud_load_balancer_target:
+    type: server
+    load_balancer: "{{ hcloud__server_loadbalancer_name }}"
+    server: "{{ hcloud__server_name }}"
+    use_private_ip: "{{ hcloud__server_loadbalancer_use_private_ip }}"
+    api_token: "{{ hcloud__api_token }}"
+  when: hcloud__server_loadbalancer_name is not none
 
 - name: Show server infos
   when: server.hcloud_server.name is defined

@@ -1,0 +1,35 @@
+---
+- name: Create a load balancer
+  hetzner.hcloud.hcloud_load_balancer:
+    name: "{{ load_balancer.name }}"
+    load_balancer_type: "{{ load_balancer.type }}"
+    location: "{{ load_balancer.location | default(hcloud__location) }}"
+    labels: "{{ load_balancer.labels | default(hcloud__labels) }}"
+    api_token: "{{ hcloud__api_token }}"
+
+- name: Create load balancer services
+  hetzner.hcloud.hcloud_load_balancer_service:
+    load_balancer: "{{ load_balancer.name }}"
+    protocol: "{{ service.protocol }}"
+    listen_port: "{{ service.port }}"
+    destination_port: "{{ service.destination_port | default(omit) }}"
+    proxyprotocol: "{{ service.proxyprotocol | default(omit) }}"
+    health_check: "{{ service.health_check | default(omit) }}"
+    http: "{{ service.http | default(omit) }}"
+    api_token: "{{ hcloud__api_token }}"
+  with_items: "{{ load_balancer.services | default([]) }}"
+  loop_control:
+    loop_var: service
+
+- name: Create load balancer targets
+  hetzner.hcloud.hcloud_load_balancer_target:
+    load_balancer: "{{ load_balancer.name }}"
+    type: "{{ target.type }}"
+    ip: "{{ target.ip | default(omit) }}"
+    label_selector: "{{ target.label_selector | default(omit) }}"
+    server: "{{ target.server | default(omit) }}"
+    use_private_ip: "{{ target.use_private_ip | default(omit) }}"
+    api_token: "{{ hcloud__api_token }}"
+  with_items: "{{ load_balancer.targets | default([]) }}"
+  loop_control:
+    loop_var: target

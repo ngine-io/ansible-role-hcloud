@@ -1,4 +1,7 @@
 ---
+hcloud__location: fsn1
+hcloud__labels: "{{ omit }}"
+
 hcloud__server_name: "{{ inventory_hostname_short }}"
 hcloud__server_type: cx11
 hcloud__server_networks: []
@@ -9,7 +12,8 @@ hcloud__server_networks: []
 #       - 10.2.0.1
 
 hcloud__server_image: debian-11
-hcloud__server_location: fsn1
+hcloud__server_location: "{{ hcloud__location }}"
+hcloud__server_labels: "{{ hcloud__labels }}"
 hcloud__server_firewalls:
   - default
 
@@ -21,6 +25,8 @@ hcloud__server_volumes: []
 
 hcloud__server_force: false
 hcloud__server_placement_group: "{{ omit }}"
+hcloud__server_loadbalancer_name:
+hcloud__server_loadbalancer_use_private_ip: false
 hcloud__server_state: started
 
 hcloud__ssh_key_name: "{{ lookup('env', 'USER') }}@{{ lookup('pipe', 'hostname') }}"
@@ -48,5 +54,35 @@ hcloud__placement_groups: []
 #   - name: my placement group
 #     labels:
 #       mylabel: test
+
+hcloud__loadbalancers: []
+# hcloud__loadbalancers:
+#   - name: my load balancer
+#     type: lb11
+#     targets:
+#       - type: label_selector
+#         label_selector: app=public
+#     services:
+#       - protocol: http
+#         port: 80
+#         health_check:
+#           interval: 15
+#           port: 80
+#           timeout: 3
+#           retries: 3
+#           protocol: http
+#           http:
+#             # Single wildcard char '?' or glob wildcard '*'
+#             status_codes:
+#               - 2*
+#               - 3*
+#               - 40?
+#             # Optional
+#             path: /
+#             domain: www.example.com
+#             response: hello world
+#       - protocol: tcp
+#         port: 443
+#         destination_port: 443
 
 hcloud__api_token: "{{ omit }}"
