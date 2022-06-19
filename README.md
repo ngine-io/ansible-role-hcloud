@@ -82,6 +82,57 @@ hcloud__placement_groups:
        project: genesis
 ```
 
+#### Loadbalancers
+
+Configure a simple load balancer and add servers as targets later (see server configs):
+
+```yaml
+hcloud__loadbalancers:
+  - name: my load balancer
+    type: lb11
+    services:
+      - protocol: http
+        port: 80
+      - protocol: tcp
+        port: 443
+        destination_port: 443
+```
+
+Configure a load balancer and use label selector hcloud feature:
+
+```yaml
+hcloud__loadbalancers:
+  - name: my load balancer
+    type: lb11
+    targets:
+      - type: label_selector
+        label_selector: app=public
+    services:
+      - protocol: http
+        port: 80
+        health_check:
+          interval: 15
+          port: 80
+          timeout: 3
+          retries: 3
+          protocol: http
+          http:
+            # Single wildcard char '?' or glob wildcard '*'
+            status_codes:
+              - 2*
+              - 3*
+              - 40?
+            # Optional
+            path: /
+            domain: www.example.com
+            response: hello world
+      - protocol: tcp
+        port: 443
+        destination_port: 443
+```
+
+#### Server Configs
+
 The following configs are server specific and meant to be set in a lower level `group_vars` or `host_vars`, e.g. `group_vars/web.yml`
 
 Server image to use:
@@ -115,6 +166,13 @@ Ensure web servers are in a placement group:
 
 ```yaml
 hcloud__server_placement_group: my placement group
+```
+
+Add server to an existing loadbalancer as server target (optionally use private IP):
+
+```yaml
+hcloud__server_loadbalancer_name: my load balancer
+hcloud__server_loadbalancer_use_private_ip: true
 ```
 
 Ensure web server have this type:
