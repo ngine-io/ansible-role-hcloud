@@ -20,7 +20,7 @@ hcloud__server_firewalls:
 hcloud__server_user_data: ""
 hcloud__server_volumes: []
 # hcloud__server_volumes:
-#   - name: vol1
+#   - name: "{{ inventory_hostname_short }}-vol1"
 #     size: 10
 
 hcloud__server_force: false
