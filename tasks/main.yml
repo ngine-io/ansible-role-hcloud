@@ -56,7 +56,7 @@
 
 - name: Ensure volume is created and formatted
   hetzner.hcloud.hcloud_volume:
-    name: "{{ hcloud__server_name }}-{{ item.name }}"
+    name: "{{ item.name }}"
     server: "{{ hcloud__server_name }}"
     automount: true
     format: "{{ item.format | default('ext4') }}"
