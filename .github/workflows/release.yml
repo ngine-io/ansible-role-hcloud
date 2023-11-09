@@ -33,5 +33,5 @@ jobs:
           ansible-galaxy role import
           --api-key "$ANSIBLE_GALAXY_API_KEY"
           --role hcloud
-          $(echo ${{ github.repository }} | cut -d/ -f1)
+          ngine_io
           $(echo ${{ github.repository }} | cut -d/ -f2)
