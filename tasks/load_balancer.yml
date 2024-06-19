@@ -1,6 +1,6 @@
 ---
 - name: Create a load balancer
-  hetzner.hcloud.hcloud_load_balancer:
+  hetzner.hcloud.load_balancer:
     name: "{{ load_balancer.name }}"
     load_balancer_type: "{{ load_balancer.type }}"
     location: "{{ load_balancer.location | default(hcloud__location) }}"
@@ -8,7 +8,7 @@
     api_token: "{{ hcloud__api_token }}"
 
 - name: Create load balancer services
-  hetzner.hcloud.hcloud_load_balancer_service:
+  hetzner.hcloud.load_balancer_service:
     load_balancer: "{{ load_balancer.name }}"
     protocol: "{{ service.protocol }}"
     listen_port: "{{ service.port }}"
@@ -22,7 +22,7 @@
     loop_var: service
 
 - name: Create load balancer targets
-  hetzner.hcloud.hcloud_load_balancer_target:
+  hetzner.hcloud.load_balancer_target:
     load_balancer: "{{ load_balancer.name }}"
     type: "{{ target.type }}"
     ip: "{{ target.ip | default(omit) }}"

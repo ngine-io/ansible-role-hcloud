@@ -7,7 +7,7 @@
   run_once: true
 
 - name: Create placement groups
-  hetzner.hcloud.hcloud_placement_group:
+  hetzner.hcloud.placement_group:
     name: "{{ item.name }}"
     type: "{{ item.type | default('spread') }}"
     labels: "{{ item.labels | default(hcloud__labels | default(omit)) }}"
@@ -16,7 +16,7 @@
   run_once: true
 
 - name: Create firewalls
-  hetzner.hcloud.hcloud_firewall:
+  hetzner.hcloud.firewall:
     name: "{{ item.name }}"
     rules: "{{ item.rules | default([]) }}"
     api_token: "{{ hcloud__api_token }}"
@@ -24,14 +24,14 @@
   run_once: true
 
 - name: Ensure SSH key exists
-  hetzner.hcloud.hcloud_ssh_key:
+  hetzner.hcloud.ssh_key:
     name: "{{ hcloud__ssh_key_name }}"
     public_key: "{{ hcloud__ssh_public_key }}"
     api_token: "{{ hcloud__api_token }}"
   run_once: true
 
 - name: Create networks
-  hetzner.hcloud.hcloud_network:
+  hetzner.hcloud.network:
     name: "{{ item.name }}"
     ip_range: "{{ item.network }}"
     api_token: "{{ hcloud__api_token }}"
@@ -39,7 +39,7 @@
   run_once: true
 
 - name: Ensure server is created
-  hetzner.hcloud.hcloud_server:
+  hetzner.hcloud.server:
     name: "{{ hcloud__server_name }}"
     server_type: "{{ hcloud__server_type }}"
     image: "{{ hcloud__server_image }}"
@@ -55,7 +55,7 @@
   register: server
 
 - name: Ensure volume is created and formatted
-  hetzner.hcloud.hcloud_volume:
+  hetzner.hcloud.volume:
     name: "{{ item.name }}"
     server: "{{ hcloud__server_name }}"
     automount: true
@@ -65,7 +65,7 @@
   with_items: "{{ hcloud__server_volumes }}"
 
 - name: Assign server to networks
-  hetzner.hcloud.hcloud_server_network:
+  hetzner.hcloud.server_network:
     network: "{{ item.name }}"
     server: "{{ hcloud__server_name }}"
     alias_ips: "{{ item.alias_ips | default(omit) }}"
@@ -73,7 +73,7 @@
   with_items: "{{ hcloud__server_networks }}"
 
 - name: Assign server to load balancer
-  hetzner.hcloud.hcloud_load_balancer_target:
+  hetzner.hcloud.load_balancer_target:
     type: server
     load_balancer: "{{ hcloud__server_loadbalancer_name }}"
     server: "{{ hcloud__server_name }}"
@@ -82,12 +82,12 @@
   when: hcloud__server_loadbalancer_name is not none
 
 - name: Show server infos
-  when: server.hcloud_server.name is defined
+  when: server.server.name is defined
   block:
     - name: Show server infos
       ansible.builtin.debug:
-        msg: "Server: {{ server.hcloud_server.name }} --> {{ server.hcloud_server.ipv4_address }}"
+        msg: "Server: {{ server.server.name }} --> {{ server.server.ipv4_address }}"
 
     - name: Assing default IP to ansible_host
       ansible.builtin.set_fact:
-        ansible_host: "{{ server.hcloud_server.ipv4_address }}"
+        ansible_host: "{{ server.server.ipv4_address }}"
