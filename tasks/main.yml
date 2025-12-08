@@ -82,12 +82,11 @@
   when: hcloud__server_loadbalancer_name is not none
 
 - name: Show server infos
-  when: server.server.name is defined
+  when: server.hcloud_server.name is defined
   block:
     - name: Show server infos
       ansible.builtin.debug:
-        msg: "Server: {{ server.server.name }} --> {{ server.server.ipv4_address }}"
-
+        msg: "Server: {{ server.hcloud_server.name }} --> {{ server.hcloud_server.ipv4_address }}"
     - name: Assing default IP to ansible_host
       ansible.builtin.set_fact:
-        ansible_host: "{{ server.server.ipv4_address }}"
+        ansible_host: "{{ server.hcloud_server.ipv4_address }}"
